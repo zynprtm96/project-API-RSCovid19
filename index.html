@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+    <style>
+        .body{
+            padding: 10px !important;
+        }
+    </style>
+</head>
+<body>
+    <h1> Daftar Rumah Sakit Rujukan Covid-19 </h1>
+    
+    <div class="row-wilayah row">
+        
+    </div>
+    
+    <table style="display:none">
+        <thead>
+            <tr>
+                <th>Rumah Sakit</th>
+                <th>Alamat</th>
+                <th>Telepon</th>
+                <th>Wilayah</th>
+            </tr>
+        </thead>
+        <tbody class="data-rs">
+
+        </tbody>
+    </table>
+
+    <script src="https://code.jquery.com/jquery-3.6.1.min.js" integrity="sha256-o88AwQnZB+VDvE9tvIXrMQaPlFFSUTR+nldQm1LuPXQ=" crossorigin="anonymous"></script>
+    <script>
+        $(document).ready(function () {
+            $.ajax({
+                url: "proses.php?function=get_provinsi",
+                method: "GET",
+                success: function(res){
+                    var res = JSON.parse(res);
+                    var html = "";
+                    res.forEach(e => {
+                        html += `
+                        <div class="col-md-4">
+                            <div class="card">
+                                <div class="card-body">
+                                  <h5 class="card-title">${e.name}</h5>
+                                  <a href="javascript:void(0)" data-prov="${e.name}" class="btn btn-primary btn-lihat">Lihat</a>
+                                </div>
+                            </div>
+                        </div>`
+                    });
+                    $(".row-wilayah").html(html)
+                }
+            });
+        })
+
+        $(document).on("click", ".btn-lihat", function(e) {
+            var prov = $(this).data("prov");
+            console.log("cek");
+            $.ajax({
+                url: "proses.php?function=get_rs&nama_provinsi=" + prov,
+                method: "GET",
+                success: function(res){
+                    var res = JSON.parse(res);
+                    console.log(res);
+                    var html = "";
+                    for (let i = 0; i < res.length; i++) {
+                        html += `
+                        <tr>
+                        <td>${res[i].nama}</td>
+                        <td>${res[i].alamat}</td>
+                        <td>${res[i].telepon}</td>
+                        <td>${res[i].wilayah}</td>
+                        </tr>`
+                    }
+                    $(".data-rs").html(html)
+                    $("table").show();
+                    $(".row-wilayah").hide();
+                }
+            });
+        })
+    </script>
+</body>
+</html>
